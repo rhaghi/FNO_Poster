@@ -1,0 +1,229 @@
+\documentclass{article}
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{amsfonts}
+\usepackage{mathtools}
+\usepackage{bm}
+
+\title{Mathematical Description of Fourier Neural Operators and Loss Functions}
+\author{}
+\date{}
+
+\begin{document}
+
+\maketitle
+
+\section{Fourier Neural Operator (FNO) Mathematics}
+
+\subsection{Problem Formulation}
+
+The Temporal Fourier Neural Operator (TFNO) is designed to learn the solution operator $\mathcal{G}$ that maps input functions to output functions:
+\begin{equation}
+\mathcal{G}: \mathcal{A} \rightarrow \mathcal{U}
+\end{equation}
+where $\mathcal{A}$ is the space of input functions (forcing functions) and $\mathcal{U}$ is the space of solution functions (displacements).
+
+For the 2DOF nonlinear system:
+\begin{equation}
+\mathcal{G}: F(t) \mapsto [x_1(t), x_2(t)]
+\end{equation}
+
+\subsection{FNO Architecture}
+
+The TFNO1d operator consists of $L$ Fourier layers. Each layer $l$ performs the following operations:
+\begin{equation}
+v_{l+1} = \sigma(W_l v_l + \mathcal{K}_l(v_l))
+\end{equation}
+where:
+\begin{itemize}
+\item $v_l \in \mathbb{R}^{d_l \times n}$ is the hidden representation at layer $l$
+\item $W_l$ is a local linear transformation
+\item $\mathcal{K}_l$ is the integral kernel operator
+\item $\sigma$ is the activation function
+\item $n$ is the discretization size (5000 time points)
+\end{itemize}
+
+\subsection{Fourier Integral Kernel}
+
+The integral kernel operator is defined as:
+\begin{equation}
+(\mathcal{K}_l(v))(x) = \int_D \kappa_l(x, y) v(y) dy
+\end{equation}
+
+In Fourier space, this becomes:
+\begin{equation}
+\mathcal{F}(\mathcal{K}_l(v)) = R_l \cdot \mathcal{F}(v)
+\end{equation}
+where $R_l \in \mathbb{C}^{d_{l+1} \times d_l \times k_{\max}}$ are learnable weights in Fourier space, and $k_{\max}$ is the number of Fourier modes retained.
+
+\subsection{Fourier Layer Implementation}
+
+For 1D temporal signals, the Fourier layer computes:
+\begin{align}
+\tilde{v}_l &= \text{FFT}(v_l) \\
+\tilde{v}_{l+1}^{(1:k_{\max})} &= R_l \cdot \tilde{v}_l^{(1:k_{\max})} \\
+\tilde{v}_{l+1}^{(k_{\max}+1:n)} &= 0 \\
+v_{l+1}^{(1)} &= \text{IFFT}(\tilde{v}_{l+1}) \\
+v_{l+1} &= \sigma(W_l v_l + v_{l+1}^{(1)})
+\end{align}
+
+\subsection{TFNO Parameters}
+
+From the code implementation:
+\begin{itemize}
+\item Number of Fourier modes: $k_{\max} = 144$
+\item Hidden channels: $d = 512$
+\item Number of layers: $L = 4$
+\item Input channels: $d_{in} = 1$ (force signal)
+\item Output channels: $d_{out} = 2$ (displacements $x_1, x_2$)
+\end{itemize}
+
+\section{Physics Loss Function}
+
+\subsection{Governing Equations}
+
+The 2DOF nonlinear Duffing oscillator system is governed by:
+\begin{align}
+m_1 \ddot{x}_1 &= F(t) - k_1 x_1 - k_2(x_1 - x_2) - k_3(x_1 - x_2)^3 \\
+m_2 \ddot{x}_2 &= k_2(x_1 - x_2) + k_3(x_1 - x_2)^3
+\end{align}
+where:
+\begin{itemize}
+\item $m_1 = 5$ kg, $m_2 = 10$ kg (masses)
+\item $k_1 = 1$, $k_2 = 3$, $k_3 = 2$ (stiffness parameters)
+\item $F(t)$ is the external forcing function
+\item $x_1(t), x_2(t)$ are displacements
+\end{itemize}
+
+\subsection{Physics Loss Calculation}
+
+The physics loss uses finite difference approximations:
+\begin{align}
+\dot{x}_i^{(n)} &\approx \frac{x_i^{(n)} - x_i^{(n-1)}}{\Delta t} \\
+\ddot{x}_i^{(n)} &\approx \frac{\dot{x}_i^{(n)} - \dot{x}_i^{(n-1)}}{\Delta t}
+\end{align}
+
+The physics residuals are:
+\begin{align}
+R_1^{(n)} &= m_1 \ddot{x}_1^{(n)} + k_1 x_1^{(n)} + k_2(x_1^{(n)} - x_2^{(n)}) + k_3(x_1^{(n)} - x_2^{(n)})^3 - F^{(n)} \\
+R_2^{(n)} &= m_2 \ddot{x}_2^{(n)} - k_2(x_1^{(n)} - x_2^{(n)}) - k_3(x_1^{(n)} - x_2^{(n)})^3
+\end{align}
+
+The physics loss is:
+\begin{equation}
+\mathcal{L}_{\text{physics}} = \frac{1}{N-2} \sum_{n=3}^{N} \left( (R_1^{(n)})^2 + (R_2^{(n)})^2 \right)
+\end{equation}
+
+\subsection{Energy Conservation Loss}
+
+The total mechanical energy is:
+\begin{equation}
+E = \frac{1}{2}m_1\dot{x}_1^2 + \frac{1}{2}m_2\dot{x}_2^2 + \frac{1}{2}k_1 x_1^2 + \frac{1}{2}k_2(x_1-x_2)^2 + \frac{1}{4}k_3(x_1-x_2)^4
+\end{equation}
+
+The work done by external force:
+\begin{equation}
+W(t) = \int_0^t F(\tau) \dot{x}_1(\tau) d\tau
+\end{equation}
+
+Energy conservation constraint:
+\begin{equation}
+\mathcal{L}_{\text{energy}} = \frac{1}{N} \sum_{n=1}^{N} \left( E^{(n)} - E^{(0)} - W^{(n)} \right)^2
+\end{equation}
+
+\section{Spectrogram Loss Function}
+
+\subsection{Short-Time Fourier Transform (STFT)}
+
+For signals $x_1(t)$ and $x_2(t)$, the STFT is computed as:
+\begin{equation}
+X_i(f, \tau) = \int_{-\infty}^{\infty} x_i(t) w(t - \tau) e^{-j2\pi ft} dt
+\end{equation}
+where $w(t)$ is the window function (Hann window):
+\begin{equation}
+w(n) = \frac{1}{2}\left(1 - \cos\left(\frac{2\pi n}{N-1}\right)\right)
+\end{equation}
+
+\subsection{Discrete STFT Implementation}
+
+\begin{equation}
+X_i[k, m] = \sum_{n=0}^{N-1} x_i[n] w[n - mH] e^{-j2\pi kn/N}
+\end{equation}
+where:
+\begin{itemize}
+\item $N = 512$ (FFT length)
+\item $H = 128$ (hop length)
+\item $k = 0, 1, \ldots, N/2$ (frequency bins)
+\item $m$ is the time frame index
+\end{itemize}
+
+\subsection{Frequency Mask}
+
+Only frequencies up to $f_{\max} = 2$ Hz are considered:
+\begin{equation}
+\mathcal{M} = \{k : f_k \leq f_{\max}\}, \quad f_k = \frac{k \cdot f_s}{N}
+\end{equation}
+where $f_s = 25$ Hz is the sampling frequency.
+
+\subsection{Spectral Convergence Loss}
+
+The magnitude spectrograms are:
+\begin{equation}
+M_i[k, m] = |X_i[k, m]|
+\end{equation}
+
+The spectral convergence loss is:
+\begin{equation}
+\mathcal{L}_{\text{SC}} = \frac{\|\bm{M}_{\text{pred}} - \bm{M}_{\text{true}}\|_F}{\|\bm{M}_{\text{true}}\|_F + \epsilon}
+\end{equation}
+where $\|\cdot\|_F$ is the Frobenius norm.
+
+\subsection{Phase Loss}
+
+The phase spectrograms are:
+\begin{equation}
+\Phi_i[k, m] = \arg(X_i[k, m])
+\end{equation}
+
+The phase difference (handling phase wrapping):
+\begin{equation}
+\Delta\Phi_i[k, m] = \arg\left(e^{j(\Phi_{i,\text{pred}}[k,m] - \Phi_{i,\text{true}}[k,m])}\right)
+\end{equation}
+
+Phase loss:
+\begin{equation}
+\mathcal{L}_{\text{phase}} = \frac{1}{|\mathcal{M}|MN} \sum_{i=1}^{2} \sum_{k \in \mathcal{M}} \sum_{m=1}^{M} (\Delta\Phi_i[k, m])^2
+\end{equation}
+
+\subsection{Combined Spectrogram Loss}
+
+\begin{equation}
+\mathcal{L}_{\text{spectral}} = w_{\text{mag}} \cdot \mathcal{L}_{\text{SC}} + w_{\text{phase}} \cdot \mathcal{L}_{\text{phase}}
+\end{equation}
+where $w_{\text{mag}} = 1.0$ and $w_{\text{phase}} = 0.1$.
+
+\section{Total Loss Function}
+
+The complete loss function combines all components:
+\begin{equation}
+\mathcal{L}_{\text{total}} = 0.4 \cdot \mathcal{L}_{\text{data}} + \lambda_{\text{physics}} \cdot \mathcal{L}_{\text{physics}} + \lambda_{\text{spectral}} \cdot \mathcal{L}_{\text{spectral}}
+\end{equation}
+where:
+\begin{itemize}
+\item $\mathcal{L}_{\text{data}}$ includes MSE and KL divergence losses
+\item $\lambda_{\text{physics}} = 0$ (physics loss weight, currently disabled)
+\item $\lambda_{\text{spectral}} = 0.1$ (spectrogram loss weight)
+\end{itemize}
+
+The data loss is:
+\begin{equation}
+\mathcal{L}_{\text{data}} = \mathcal{L}_{\text{MSE}} + \mathcal{L}_{\text{KLD}}
+\end{equation}
+
+where:
+\begin{align}
+\mathcal{L}_{\text{MSE}} &= \frac{1}{B \cdot 2 \cdot N} \sum_{b=1}^{B} \sum_{i=1}^{2} \sum_{n=1}^{N} (x_{i,\text{pred}}^{(b,n)} - x_{i,\text{true}}^{(b,n)})^2 \\
+\mathcal{L}_{\text{KLD}} &= \text{KL}(\log \text{softmax}(\bm{x}_{\text{pred}}) \| \text{softmax}(\bm{x}_{\text{true}}))
+\end{align}
+
+\end{document}

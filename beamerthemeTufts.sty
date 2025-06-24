@@ -1,0 +1,202 @@
+\ProvidesPackage{beamerthemeTufts}
+
+%%%%%%%%%%%%%%%%%%%%%
+\definecolor{darkgreen}{RGB}{34,139,34}
+%\definecolor{darkred}{RGB}{178,34,34}
+
+\definecolor{tuftsbrown}{RGB}{94,75,60}
+\definecolor{tuftsblue}{RGB}{62, 142, 222}
+
+\definecolor{lightblue}{RGB}{173,216,230}
+%\definecolor{blue}{RGB}{65,105,225}
+\definecolor{blueBars}{RGB}{0,0,255}
+%%%%%%%%%%%%%%%%%%%%%
+
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%\RequirePackage{tangocolors}
+\selectcolormodel{cmyk}
+\mode<presentation>
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\setbeamercolor{headline}{fg=white,bg=blueBars}
+\setbeamercolor{footline}{fg=black, bg=white}
+\setbeamerfont{footline}{size=\large,series=\normalfont}
+\setbeamercolor{separation line}{bg=white}
+\setbeamercolor{title in headline}{fg=white}
+\setbeamercolor{author in headline}{fg=white}
+\setbeamercolor{institute in headline}{fg=white}
+
+\setbeamercolor{framesubtitle}{fg=white, bg=blueBars}
+\setbeamercolor{author in head/foot}{fg=white, bg=blueBars}
+\setbeamercolor{title in head/foot}{fg=white, bg=blueBars}
+
+% CHANGED: Main background to white, text to black
+\setbeamercolor*{normal text}{fg=black, bg=white}
+\setbeamercolor*{graphicsblock}{fg=white, bg=white}
+\setbeamercolor*{block body}{bg=white,fg=black}
+% UNCHANGED: Block title keeps blueBars background
+\setbeamercolor*{block title}{fg=white,bg=blueBars}
+\setbeamerfont{block title}{size=\large,series=\bf}
+\setbeamercolor{upper separation line head}{fg=tuftsbrown}
+
+% ADDED: Poster column color for borders
+\setbeamercolor{postercolumn}{fg=black, bg=white}
+
+%\setbeamercolor*{example body}{fg=ta3aluminium,bg=black}
+%\setbeamercolor*{example text}{fg=ta3aluminium,bg=black}
+%\setbeamercolor*{example title}{bg=taorange,fg=ta2gray}
+
+%\setbeamercolor{alerted text}{fg=darkred}
+
+%\setbeamercolor{example text}{fg=taorange}
+\setbeamercolor{structure}{fg=blueBars}
+
+\setbeamertemplate{itemize items}[triangle]
+\setbeamertemplate{navigation symbols}{}  % no navigation on a poster
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\setbeamertemplate{block begin}{
+  \vskip.75ex
+  \begin{beamercolorbox}[ht=4ex,dp=0.2ex,center,leftskip=-1em,colsep*=.75ex]{block title}%
+    \usebeamerfont*{block title}%
+    {\phantom{Gg}\insertblocktitle}% phantom because of baseline problem
+  \end{beamercolorbox}%
+  {\ifbeamercolorempty[bg]{block body}{}{\nointerlineskip\vskip-0.5pt}}%
+  \usebeamerfont{block body}%
+  \begin{beamercolorbox}[leftskip=1em,colsep*=.75ex,sep=0.5ex,vmode]{block body}%
+    \ifbeamercolorempty[bg]{block body}{\vskip-.25ex}{\vskip-.75ex}\vbox{}%
+  }
+  \setbeamertemplate{block end}{
+  \end{beamercolorbox}
+}
+
+\setbeamertemplate{bibliography item}[text]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\setbeamertemplate{headline}{  
+  \leavevmode
+
+  \begin{beamercolorbox}[wd=\paperwidth]{headline}
+	\begin{center}
+		\vskip4ex
+		\usebeamercolor{title in headline}{\color{fg}\textbf{\LARGE{\inserttitle}}\\[1ex]}
+	\end{center}
+	\begin{columns}
+	\column{.2 \linewidth}
+         \vspace{-2.5cm}
+        \begin{flushleft}
+        \hspace{1.5cm}
+	{%\usebeamercolor[bg]{graphicsblock}
+		\includegraphics[width=0.55\textwidth]{figures/IAI_vert_white.eps}}
+	\end{flushleft}	
+	\column{.6 \linewidth}
+	\begin{center}
+        \usebeamercolor{author in headline}{\color{fg}\large{\insertauthor}\\[1ex]}
+        \usebeamercolor{institute in headline}{\color{fg}\large{\insertinstitute}\\[1ex]}
+        \end{center}
+        \column{.2 \linewidth}
+        \end{columns}
+	\vskip2ex
+	
+    %\begin{columns}[T]
+    %  \begin{column}{.02\paperwidth}
+    %  \end{column}
+	  %\begin{column}{.15\paperwidth}
+        %\vskip8ex
+        %\begin{center}
+          %\includegraphics[width=.95\linewidth]{figures/tufts-logo}
+		  %\includegraphics[height=.3\linewidth]{figures/tufts-logo}
+        %\end{center}
+        %\vskip2ex
+      %\end{column}
+     % \begin{column}{.8\paperwidth}
+     %   \vskip4ex
+     %   %\raggedleft
+	 %	\centering
+     %  \usebeamercolor{title in headline}{\color{fg}\textbf{\LARGE{\inserttitle}}\\[1ex]}
+     %  \usebeamercolor{author in headline}{\color{fg}\large{\insertauthor}\\[1ex]}
+     %   \usebeamercolor{institute in headline}{\color{fg}\large{\insertinstitute}\\[1ex]}     
+     % \end{column}
+     % \begin{column}{.15\paperwidth}
+     %  \vskip8ex
+        %\begin{center}
+	%	  \hfill\includegraphics[width=.35\linewidth]{figures/tufts-logo}\\[1ex]
+     %     \hfill\includegraphics[width=.85\linewidth]{figures/llnl-logo}
+        %\end{center}
+      %  \vskip2ex
+    %  \end{column}
+    %  \begin{column}{.02\paperwidth}
+    %  \end{column}
+    %\end{columns}
+    %\vskip2ex
+  \end{beamercolorbox}
+
+  \begin{beamercolorbox}[wd=\paperwidth]{lower separation line head}
+    \rule{0pt}{3pt}
+  \end{beamercolorbox}
+}
+
+%  \setbeamertemplate{headline}{  
+%    \leavevmode
+%    \begin{beamercolorbox}[sep=0.5cm,wd=.8\paperwidth]{headline}
+%      \usebeamercolor{title in headline}{\raggedleft\color{fg}\textbf{\LARGE{\inserttitle}}\\[1ex]}
+%      \usebeamercolor{author in headline}{\raggedleft\color{fg}\large{\insertauthor}\\[1ex]}
+%      \usebeamercolor{institute in headline}{\raggedleft\color{fg}\large{\insertinstitute}\\[1ex]}     
+%    \end{beamercolorbox}%
+%    \begin{beamercolorbox}[wd=.2\paperwidth]{logo in headline}
+%      \centering
+%      \LARGE{LOGO}
+%    \end{beamercolorbox}  
+
+
+%}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\setbeamertemplate{footline}
+  {
+  \begin{beamercolorbox}[wd=\paperwidth]{upper separation line foot}
+    \rule{0pt}{3pt}
+  \end{beamercolorbox}
+  
+  \leavevmode%
+  \begin{beamercolorbox}
+[wd=\paperwidth,ht=6ex,leftskip=1em,rightskip=1em]{author in head/foot}%
+  \vspace{0.7cm}  % ADD THIS LINE to move text up within the footer box
+  rad.haghi@tufts.edu
+  \hfill
+  {\textit{Accuracy and Efficiency in Scientific Machine Learning}, June 25--27, 2025, Montreal, Canada
+}
+\end{beamercolorbox}
+  \vskip1pt%
+  \begin{beamercolorbox}[wd=\paperwidth]{lower separation line foot}
+    \rule{0pt}{3pt}
+  \end{beamercolorbox}
+}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Display a grid to help align images ... and it looks nice with this color scheme
+%\beamertemplategridbackground[1cm]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\mode<all>
+
+% adapt height of imtemize rectangles
+\setbeamertemplate{itemize items}[triangle]
+\setbeamertemplate{itemize item}{\raisebox{0.12ex}{$\blacktriangleright$}\hskip0.1em}
+\setbeamertemplate{itemize subitem}{\raisebox{0.12ex}{$\triangleright$}\hskip0.1em}
+% or define your own template using \defbeamertemplate{itemize item}, see beameruserguide.pdf
+
+% equal font sizes for all levels
+\setbeamerfont{itemize/enumerate body}{size=\normalsize}
+\setbeamerfont{itemize/enumerate subbody}{size=\normalsize}
+\setbeamerfont{itemize/enumerate subsubbody}{size=\normalsize}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%% Local Variables: 
+%%% mode: latex
+%%% TeX-PDF-mode: t
+%%% TeX-master: "poster-surf"
+%%% End:
